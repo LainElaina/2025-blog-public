@@ -30,6 +30,10 @@
 		{
 			"id": "a46372ff45bc5524",
 			"url": "/images/art/a46372ff45bc5524.jpg"
+		},
+		{
+			"id": "96448e5de313708d",
+			"url": "/images/art/96448e5de313708d.png"
 		}
 	],
 	"currentArtImageId": "a46372ff45bc5524",
@@ -37,34 +41,31 @@
 		{
 			"id": "",
 			"url": ""
+		},
+		{
+			"id": "ceff8fdac40d5b61",
+			"url": "/images/background/ceff8fdac40d5b61.jpg"
 		}
 	],
-	"currentBackgroundImageId": "",
+	"currentBackgroundImageId": "ceff8fdac40d5b61",
 	"socialButtons": [
 		{
 			"id": "github",
 			"type": "github",
-			"value": "https://github.com/yysuni",
+			"value": "https://github.com/lainelaina",
 			"label": "Github",
-			"order": 3
-		},
-		{
-			"id": "juejin",
-			"type": "juejin",
-			"value": "https://juejin.cn/user/2427311675422382",
-			"label": "稀土掘金",
 			"order": 2
 		},
 		{
 			"id": "email",
 			"type": "email",
-			"value": "yysuni1001@gmail.com",
+			"value": "lainelaina520@gmail.com",
 			"label": "",
 			"order": 1
 		}
 	],
-	"clockShowSeconds": false,
-	"summaryInContent": false,
+	"clockShowSeconds": true,
+	"summaryInContent": true,
 	"isCachePem": false,
 	"hideEditButton": false,
 	"enableCategories": true,
