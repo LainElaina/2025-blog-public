@@ -1,8 +1,26 @@
-# 2025 Blog
+# 2025 Blog - LainElaina 改版（Next.js 15 + Cloudflare Workers 适配）
 
-> 最新引导说明：https://www.yysuni.com/blog/readme
+> **这是 LainElaina对原仓库 YYsuni/2025-blog-public 的cf适配修改分支**，可能包含我的部分文章，如果你要直接使用我改好适配cf的版本，请记得去掉文章后再写你自己的文章）
+
+> **主要变更：** > - 原版使用 Next.js 16，在 Cloudflare Workers + opennextjs-cloudflare 适配器下存在严重兼容问题（Dynamic require not supported、handler32 is not a function 等运行时 500 错误）。  
+
+> - 已强制降级到 Next.js 15.1.0 + React 19.0.0，解决兼容性问题，功能完整保留，性能稳定。  
+
+> - 额外添加了 `.npmrc`（node-linker=hoisted + shamefully-hoist=true）强制平铺依赖，避免 pnpm symlink 导致的构建失败。  
+
+> - 已成功部署到 Cloudflare Workers，支持自定义域名（如 blog.lainelaina.top）。
+  
+> - 网页端编辑、GitHub App 鉴权、自动 commit 等核心功能正常使用。  
+
+> - 不建议回升 Next.js 16，除非 @opennextjs/cloudflare 官方完全适配 
+16.x（目前仍有较多 issue）。
+
+原仓库地址：https://github.com/YYsuni/2025-blog-public  
+最新引导说明（原作者）：https://www.yysuni.com/blog/readme
 
 该项目使用 Github App 管理项目内容，请保管好后续创建的 **Private key**，不要上传到公开网上。
+
+---
 
 ## 1. 安装
 
@@ -19,7 +37,47 @@ export const GITHUB_CONFIG = {
 
 也可以自己手动先调整安装，可自行 `pnpm i`
 
+**本魔改版额外说明：** 本地开发推荐使用 `.env.local` 文件（不会被 git 提交）添加环境变量：
+```env
+NEXT_PUBLIC_GITHUB_OWNER=你的用户名
+NEXT_PUBLIC_GITHUB_REPO=2025-blog-public
+NEXT_PUBLIC_GITHUB_BRANCH=main
+NEXT_PUBLIC_GITHUB_APP_ID=你的AppID
+```
+
+---
+
 ## 2. 部署
+
+### 2.1 Cloudflare Workers 部署（本版推荐方式）
+
+本版已验证 Cloudflare Workers 部署成功，步骤如下：
+
+1. Fork 本仓库到你自己的 GitHub。
+2. 本地克隆：`git clone https://github.com/你的用户名/2025-blog-public.git`
+3. 安装依赖：`pnpm install`
+4. 登录 Cloudflare：`npx wrangler login`
+5. 构建 & 部署：
+   ```bash
+   pnpm run build:cf
+   pnpm run deploy
+   ```
+6. 在 Cloudflare Dashboard 配置 4 个环境变量（Worker → Settings → Variables & Secrets）：
+   - `NEXT_PUBLIC_GITHUB_OWNER`
+   - `NEXT_PUBLIC_GITHUB_REPO`
+   - `NEXT_PUBLIC_GITHUB_BRANCH`
+   - `NEXT_PUBLIC_GITHUB_APP_ID`
+   类型全部选 **文本（Plain text）**，保存后 Redeploy。
+7. 绑定自定义域名（Triggers → Custom domains → Add custom domain，全小写输入）。
+
+**Git 自动部署推荐配置（已测试有效）：**
+- 构建命令：`pnpm install && pnpm run build:cf`
+- 部署命令：`pnpm run deploy`
+- 版本命令：清空
+- 构建缓存：必须启用（大幅加速 pnpm install）
+- 构建环境变量：同上 4 个 NEXT_PUBLIC_ 变量（这里也是明文，无类型选择）
+
+### 2.2 Vercel 部署（原版方式）
 
 我这里熟悉 Vercel 部署，就以 Vercel 部署为例子。创建 Project => Import 这个项目
 
@@ -31,7 +89,9 @@ export const GITHUB_CONFIG = {
 
 大约 60 秒会部署完成，有一个直接 vercel 域名，如：https://2025-blog-public.vercel.app/
 
-到这里部署网站已经完成了，下一步创建 Github App
+到这里部署网站已经完成了，下一步创建 Github App。
+
+---
 
 ## 3. 创建 Github App 链接仓库
 
@@ -75,7 +135,10 @@ export const GITHUB_CONFIG = {
 设置完成后，需要手动再部署一次，让环境变量生效。
 * 可以直接 push 一次仓库代码会触发部署
 * 也可以手动选择创建一次部署
+
 ![](https://www.yysuni.com/blogs/readme/59a802ed8d1c3a13.png)
+
+---
 
 ## 4. 完成
 
@@ -83,9 +146,13 @@ export const GITHUB_CONFIG = {
 
 **提示**，网站前端页面删改完提示成功之后，你需要等待后台的部署完成，再刷新页面才能完成服务器内容的更新哦。
 
+---
+
 ## 5. 删除
 
 使用这个项目应该第一件事需要删除我的 blog，单独删除，批量删除已完成。
+
+---
 
 ## 6. 配置
 
@@ -97,9 +164,13 @@ export const GITHUB_CONFIG = {
 
 ![](https://www.yysuni.com/blogs/readme/cddb4710e08a5069.png)
 
+---
+
 ## 7. 写 blog
 
 写 blog 的图片管理，可能会有疑惑。图片管理推荐逻辑是先点击 **+ 号** 添加图片，（推荐先压缩好，尺寸推荐宽度不超过 1200）。然后将上传好的图片直接拖入文案编辑区，这就已经添加好了，点击右上角预览就可以看到效果。
+
+---
 
 ## 8. 写给非前端
 
@@ -128,6 +199,8 @@ const LiquidGrass = dynamic(() => import('@/components/liquid-grass'), { ssr: fa
 
 ![](https://www.yysuni.com/blogs/readme/20b0791d012163ee.png)
 
+---
+
 ## 9. 互助群
 
 对于完全不是**程序员**的用户，确实会对于更新代码后，如何同步，如何**合并代码**手足无措。我创建了一个 **QQ群**（加群会简单点），或者 vx 群还是 tg 群会好一点可以 issue 里面说下就行。
@@ -135,11 +208,10 @@ const LiquidGrass = dynamic(() => import('@/components/liquid-grass'), { ssr: fa
 QQ 群：[https://qm.qq.com/q/spdpenr4k2](https://qm.qq.com/q/spdpenr4k2)
 > 不好意思，之前的那个qq群ID（1021438316），不知道为啥搜不到😂
 
-微信群：刚建好了一个微信群，没有 qq 的可以用这个微信群
+微信群：刚建好了一个微信群，没有 qq 的可以用这个微信群  
 ![](https://www.yysuni.com/blogs/readme/343f2c62035b8e23.webp)
 
 tg 群：1月1号，才创建的 tg 群 https://t.me/public_blog_2025
-
 
 应该主要是我自己亲自帮助你们遇到问题怎么办。（后续看看有没有好心人）
 
@@ -152,6 +224,8 @@ tg 群：1月1号，才创建的 tg 群 https://t.me/public_blog_2025
 因为这个 Card 是全局都在的，所以放在了 `src/components` 目录
 
 ![](https://www.yysuni.com/blogs/readme/9780c38f886322fd.png)
+
+---
 
 ## Star History
 
