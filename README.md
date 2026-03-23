@@ -1,19 +1,12 @@
-# 2025 Blog - LainElaina 改版（Next.js 15 + Cloudflare Workers 适配）
+# 2025 Blog - LainElaina 魔改版（Next.js 15 + Cloudflare Workers 适配）
 
-> **这是 LainElaina对原仓库 YYsuni/2025-blog-public 的cf适配修改分支**，可能包含我的部分文章，如果你要直接使用我改好适配cf的版本，请记得去掉文章后再写你自己的文章）
-
+> **这是 LainElaina对原仓库 YYsuni/2025-blog-public 的cf适配修改分支**，可能包含我的部分文章，如果你要直接使用我改好适配cf的版本，请记得去掉文章后再写你自己的文章） 
 > **主要变更：** > - 原版使用 Next.js 16，在 Cloudflare Workers + opennextjs-cloudflare 适配器下存在严重兼容问题（Dynamic require not supported、handler32 is not a function 等运行时 500 错误）。  
-
-> - 已强制降级到 Next.js 15.1.0 + React 19.0.0，解决兼容性问题，功能完整保留，性能稳定。  
-
+> - 已强制降级到 Next.js 15.1.0 + React 19.0.0，彻底解决兼容性问题，功能完整保留，性能稳定。  
 > - 额外添加了 `.npmrc`（node-linker=hoisted + shamefully-hoist=true）强制平铺依赖，避免 pnpm symlink 导致的构建失败。  
-
-> - 已成功部署到 Cloudflare Workers，支持自定义域名（如 blog.lainelaina.top）。
-  
+> - 已成功部署到 Cloudflare Workers，支持自定义域名（如 blog.lainelaina.top）。  
 > - 网页端编辑、GitHub App 鉴权、自动 commit 等核心功能正常使用。  
-
-> - 不建议回升 Next.js 16，除非 @opennextjs/cloudflare 官方完全适配 
-16.x（目前仍有较多 issue）。
+> - 不建议回升 Next.js 16，除非 @opennextjs/cloudflare 官方完全适配 16.x（目前仍有较多 issue）。
 
 原仓库地址：https://github.com/YYsuni/2025-blog-public  
 最新引导说明（原作者）：https://www.yysuni.com/blog/readme
@@ -77,7 +70,28 @@ NEXT_PUBLIC_GITHUB_APP_ID=你的AppID
 - 构建缓存：必须启用（大幅加速 pnpm install）
 - 构建环境变量：同上 4 个 NEXT_PUBLIC_ 变量（这里也是明文，无类型选择）
 
-### 2.2 Vercel 部署（原版方式）
+#### ⚠️ Cloudflare 部署踩坑记录与解决方案
+
+**问题：在 Cloudflare 自动构建时，日志报错 `ERROR packages field missing` 导致构建失败。**
+* **报错现象**：构建卡在依赖安装阶段，提示 `ERROR packages field missing or empty. For help, run: pnpm help install`。
+* **原因分析**：原仓库遗留了 `pnpm-workspace.yaml` 文件，导致 pnpm 在 Cloudflare 的严格干净容器环境中，误认为这是一个 monorepo（多包工作区项目）。既然是工作区，pnpm 就强制要求配置 `packages` 字段。本地由于有 `.pnpm-store` 缓存和非严格模式，通常会宽容处理不报错，但在 Cloudflare 上会直接拦截。
+* **最终解决方案（推荐单包项目使用此法）**：
+    由于我们本质上是一个单包项目，最快、最干净的解决办法就是**直接删除**该文件。
+    ```bash
+    # 1. 删除多余的 workspace 配置文件（在项目根目录执行）
+    rm pnpm-workspace.yaml
+    
+    # 2. 重新安装依赖，更新 lockfile
+    pnpm install
+    
+    # 3. 提交并推送到 GitHub，触发重新构建
+    git add .
+    git commit -m "fix: remove pnpm-workspace.yaml for CF build"
+    git push origin main
+    ```
+    删除该文件后，pnpm 不再将其视为 workspace 项目，即可顺利通过 Cloudflare 的严格依赖校验，秒解此坑！
+
+### 2.2 Vercel 部署（博客框架作者的原版方式）
 
 我这里熟悉 Vercel 部署，就以 Vercel 部署为例子。创建 Project => Import 这个项目
 
