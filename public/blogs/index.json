@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "slug": "CF-Stats-Dashboard",
+    "title": "Cloudflare站点实时访问统计 (Serverless 部署指南)",
+    "tags": [
+      "Cloudflare"
+    ],
+    "date": "2026-02-01T15:27",
+    "summary": "利用 Cloudflare Workers 实现无服务器的实时流量24小时统计看板。",
+    "cover": "/blogs/CF-Stats-Dashboard/41e9408627aef190.png",
+    "hidden": false,
+    "category": ""
+  }
+]
